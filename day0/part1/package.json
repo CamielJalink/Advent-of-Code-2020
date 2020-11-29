@@ -4,7 +4,7 @@
   "description": "Advent of Code",
   "main": "index.js",
   "scripts": {
-    "start": "tsc && node dist/index.js"
+    "start": "tsc && npx eslint src/index.ts && node dist/index.js"
   },
   "author": "CJ",
   "license": "ISC",
