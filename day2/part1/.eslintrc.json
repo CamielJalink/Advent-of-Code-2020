@@ -16,6 +16,7 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "prefer-const": 1,
         "@typescript-eslint/no-inferrable-types": 0
     }
 }
