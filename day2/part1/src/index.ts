@@ -7,22 +7,22 @@ function advent() {
   let numValidSledPasswords: number = 0;     // Answer for part 1
   let numValidTobogganPasswords: number = 0; // Answer for part 2
 
-  // Check each password individually, and update the number of correct passwords on a positive response.
   input.forEach((passwordLine: string) => {
-    let parsedPassword: string[] = passwordLine.split(/\W/); // split password string on '-', ':' and space
-    parsedPassword.splice(3,1);                              // remove empty string element in the array.
+    const parsedPassword: string[] = passwordLine.split(/\W/); // split password string on '-', ':' and space
+    parsedPassword.splice(3,1);                              // remove empty string element in the array at index 3.
 
     if(checkSledPasswordValid(Number(parsedPassword[0]), Number(parsedPassword[1]), parsedPassword[2], parsedPassword[3])){
       numValidSledPasswords++;
     }
-    // if(checkTobogganPasswordValid()){
-    //   numValidTobogganPasswords++;
-    // }
+    if (checkTobogganPasswordValid(Number(parsedPassword[0]), Number(parsedPassword[1]), parsedPassword[2], parsedPassword[3])){
+      numValidTobogganPasswords++;
+    }
   })
 
   console.log("Number of valid sled passwords is: ", numValidSledPasswords);
   console.log("Number of valid toboggan passwords is: ", numValidTobogganPasswords);
 }
+
 
 
 function checkSledPasswordValid(policyLowerBound:number, policyUpperBound: number, policyLetter: string, password: string): boolean{
@@ -33,6 +33,22 @@ function checkSledPasswordValid(policyLowerBound:number, policyUpperBound: numbe
     }
   }
   return (policyLetterCount >= policyLowerBound && policyLetterCount <= policyUpperBound);
+}
+
+
+
+function checkTobogganPasswordValid(firstPosition: number, secondPosition: number, policyLetter: string, password: string): boolean {
+  firstPosition--;  // No 0-index
+  secondPosition--; // No 0-index
+
+  let validPositions: number = 0;
+  if(password.substring(firstPosition, firstPosition + 1) === policyLetter){
+    validPositions++;
+  }
+  if (password.substring(secondPosition, secondPosition + 1) === policyLetter) {
+    validPositions++;
+  }
+  return validPositions === 1;
 }
 
 advent();
