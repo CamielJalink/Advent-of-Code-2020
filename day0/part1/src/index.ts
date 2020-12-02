@@ -1,8 +1,8 @@
 import { readFileSync } from "fs";
 
 function advent() {
-  let stringInput: string = readFileSync("input.txt", "utf-8");
-  let input: string[] = stringInput.split("\n");
+  const stringInput: string = readFileSync("input.txt", "utf-8");
+  const input: string[] = stringInput.split("\r\n");
   console.log(input);
 }
 
