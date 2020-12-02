@@ -4,39 +4,35 @@ function advent() {
   const stringInput: string = readFileSync("input.txt", "utf-8");
   const input: string[] = stringInput.split("\r\n");
   
-  let numValidPasswords = 0;
+  let numValidSledPasswords: number = 0;     // Answer for part 1
+  let numValidTobogganPasswords: number = 0; // Answer for part 2
+
+  // Check each password individually, and update the number of correct passwords on a positive response.
   input.forEach((passwordLine: string) => {
-    if(checkPasswordValid(passwordLine)){
-      numValidPasswords++;
+    let parsedPassword: string[] = passwordLine.split(/\W/); // split password string on '-', ':' and space
+    parsedPassword.splice(3,1);                              // remove empty string element in the array.
+
+    if(checkSledPasswordValid(Number(parsedPassword[0]), Number(parsedPassword[1]), parsedPassword[2], parsedPassword[3])){
+      numValidSledPasswords++;
     }
+    // if(checkTobogganPasswordValid()){
+    //   numValidTobogganPasswords++;
+    // }
   })
-  console.log(numValidPasswords);
+
+  console.log("Number of valid sled passwords is: ", numValidSledPasswords);
+  console.log("Number of valid toboggan passwords is: ", numValidTobogganPasswords);
 }
 
 
-function checkPasswordValid(passwordLine: string): boolean{
-  const passLineArray: string[]  = passwordLine.split(": ");
-  const password: string         = passLineArray[1];
-  const policy: string[]         = passLineArray[0].split(" ");
-  const policyLetter: string     = policy[1];
-  const policyNumbers: string[]  = policy[0].split("-");
-  const policyLowerBound: number = Number(policyNumbers[0]);
-  const policyUpperBound: number = Number(policyNumbers[1]);
-
-  // Regular expression gebruiken om te splitten op meerdere zaken? 
-
+function checkSledPasswordValid(policyLowerBound:number, policyUpperBound: number, policyLetter: string, password: string): boolean{
   let policyLetterCount = 0;
   for(let i = 0; i < password.length; i++){
     if(password[i] === policyLetter){
       policyLetterCount++;
     }
   }
-
-  if(policyLetterCount >= policyLowerBound && policyLetterCount <= policyUpperBound ){
-    return true;
-  } else{
-    return false;
-  }
+  return (policyLetterCount >= policyLowerBound && policyLetterCount <= policyUpperBound);
 }
 
 advent();
