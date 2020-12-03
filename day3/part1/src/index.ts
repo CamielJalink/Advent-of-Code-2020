@@ -3,16 +3,21 @@ import { readFileSync } from "fs";
 function advent() {
   const stringInput: string = readFileSync("input.txt", "utf-8");
   const input: string[] = stringInput.split("\r\n");
-  console.log(countTrees(input));
+  const descent1 = countTrees(input, 3, 1);
+  console.log("Answer of part one is " + descent1);
+  const descent2 = countTrees(input, 5, 1);
+  const descent3 = countTrees(input, 1, 1);
+  const descent4 = countTrees(input, 7, 1);
+  const descent5 = countTrees(input, 1, 2);
+  console.log("Answer of part two is " + descent1*descent2*descent3*descent4*descent5);
 }
 
 
-function countTrees(slope: string[]){
-  const xStep: number = 3;
+function countTrees(slope: string[], xStep: number, yStep: number){
   let currentXcoord: number = 0;
   let treeCount: number = 0;
 
-  for(let y = 0; y < slope.length; y++){
+  for(let y = 0; y < slope.length; y+=yStep){
 
     let currentYslope = slope[y];
     while(currentXcoord >= currentYslope.length){
@@ -20,7 +25,6 @@ function countTrees(slope: string[]){
     }
 
     if(currentYslope[currentXcoord] === '#'){
-      console.log("found a tree on line ", y);
       treeCount++;
     }
 
