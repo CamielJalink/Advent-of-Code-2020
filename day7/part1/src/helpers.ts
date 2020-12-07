@@ -1,35 +1,61 @@
 export function parseRules(rules: string[]) {
-  let bagRuleSet: BagRule[][] = [];
+  let bagRules: BagRule[] = [];
   
-  rules.forEach((ruleSet: string) => {
-    let bagRules: BagRule[] = [];
-    ruleSet.split(/ contain |, /).forEach((bagRuleString: string) => {
-      if(bagRuleString !== 'no other bags.'){
-        bagRules.push(new BagRule(bagRuleString));
-      }
-    })
-    bagRuleSet.push(bagRules);
+  rules.forEach((rule: string) => {
+    bagRules.push(new BagRule(rule));
   })
 
-  return bagRuleSet;
+  bagRules.forEach((bagRule: BagRule) => {
+    bagRule.childrenNames.forEach((bagRuleName: string) => {
+      bagRules.forEach((childRule: BagRule) => {
+        if(childRule.name === bagRuleName){
+          bagRule.children.push(childRule);
+        }
+      })
+    });
+  })
+
+  return bagRules;
 }
 
 
-// Kan ik een rule opsplitsen in bags? 
-export class BagRule{
-  amount: number = 1;
-  adjective: string;
-  color: string;
 
-  constructor(bagRuleString: string){
-    let stringProperties = bagRuleString.split(' ');
-    
-    if(!isNaN(Number(stringProperties[0]))){
-      this.amount = Number(stringProperties[0]);
-      stringProperties.shift();
+export class BagRule{
+  name: string = "";
+  childrenNames: string[] = [];
+  children: BagRule[] = [];
+
+  constructor(rule: string){
+    let bags = rule.split(/ contain |, /);
+    let bagString = bags[0].split(' ');
+    bagString.pop();
+    this.name = bagString[0] + " " + bagString[1];
+
+    if(bags[1] !== 'no other bags.'){
+      for(let i = 1; i < bags.length; i++){
+        let bagSplit: string[] = bags[i].split(' ');
+        this.childrenNames.push(bagSplit[1] + " " + bagSplit[2]);
+      }
+    }
+  }
+
+  checkIfContainsColor(color: string): boolean{
+    let containsColor: boolean = false;
+
+    this.children.forEach((child: BagRule) => {
+      if(child.name === color){
+        containsColor = true;
+      }
+    })
+
+    if(!containsColor){
+      this.children.forEach((child: BagRule) => {
+        if(child.checkIfContainsColor(color)){
+          containsColor = true;
+        }
+      })
     }
 
-    this.adjective = stringProperties[0];
-    this.color = stringProperties[1];
+    return containsColor;
   }
 }

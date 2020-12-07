@@ -2,31 +2,54 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BagRule = exports.parseRules = void 0;
 function parseRules(rules) {
-    var bagRuleSet = [];
-    rules.forEach(function (ruleSet) {
-        var bagRules = [];
-        ruleSet.split(/ contain |, /).forEach(function (bagRuleString) {
-            if (bagRuleString !== 'no other bags.') {
-                bagRules.push(new BagRule(bagRuleString));
-            }
-        });
-        bagRuleSet.push(bagRules);
+    var bagRules = [];
+    rules.forEach(function (rule) {
+        bagRules.push(new BagRule(rule));
     });
-    return bagRuleSet;
+    bagRules.forEach(function (bagRule) {
+        bagRule.childrenNames.forEach(function (bagRuleName) {
+            bagRules.forEach(function (childRule) {
+                if (childRule.name === bagRuleName) {
+                    bagRule.children.push(childRule);
+                }
+            });
+        });
+    });
+    return bagRules;
 }
 exports.parseRules = parseRules;
-// Kan ik een rule opsplitsen in bags? 
 var BagRule = /** @class */ (function () {
-    function BagRule(bagRuleString) {
-        this.amount = 1;
-        var stringProperties = bagRuleString.split(' ');
-        if (!isNaN(Number(stringProperties[0]))) {
-            this.amount = Number(stringProperties[0]);
-            stringProperties.shift();
+    function BagRule(rule) {
+        this.name = "";
+        this.childrenNames = [];
+        this.children = [];
+        var bags = rule.split(/ contain |, /);
+        var bagString = bags[0].split(' ');
+        bagString.pop();
+        this.name = bagString[0] + " " + bagString[1];
+        if (bags[1] !== 'no other bags.') {
+            for (var i = 1; i < bags.length; i++) {
+                var bagSplit = bags[i].split(' ');
+                this.childrenNames.push(bagSplit[1] + " " + bagSplit[2]);
+            }
         }
-        this.adjective = stringProperties[0];
-        this.color = stringProperties[1];
     }
+    BagRule.prototype.checkIfContainsColor = function (color) {
+        var containsColor = false;
+        this.children.forEach(function (child) {
+            if (child.name === color) {
+                containsColor = true;
+            }
+        });
+        if (!containsColor) {
+            this.children.forEach(function (child) {
+                if (child.checkIfContainsColor(color)) {
+                    containsColor = true;
+                }
+            });
+        }
+        return containsColor;
+    };
     return BagRule;
 }());
 exports.BagRule = BagRule;

@@ -10,22 +10,16 @@ function advent() {
 
 
 function findBagColorsContainingGold(rules: string[]){
-  let bagRuleSet: BagRule[][] = parseRules(rules);
+  const bagRules: BagRule[] = parseRules(rules);
+  let numBagsContainingGold: number = 0;
 
-  let differentColors: Set<string> = new Set();     // This should become a Set!
-
-  bagRuleSet.forEach((bagRules: BagRule[]) => {
-
-    // Je moet niet de outermost bag pakken, maar de parentbag
-    for(let i = 0; i < bagRules.length; i++){
-
-      if(i > 0 && bagRules[i].color === 'gold' && bagRules[i].adjective === 'shiny'){
-        differentColors.add(bagRules[i-1].color);
-      }
+  bagRules.forEach((bagRule: BagRule) => {
+    if(bagRule.checkIfContainsColor("shiny gold")){
+      numBagsContainingGold++;
     }
   })
 
-  console.log(differentColors);
+  console.log("Answer part one", numBagsContainingGold);
 }
 
 advent();
