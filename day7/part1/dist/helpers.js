@@ -22,7 +22,8 @@ var BagRule = /** @class */ (function () {
     function BagRule(rule) {
         this.name = "";
         this.childrenNames = [];
-        this.children = [];
+        this.childrenAmounts = []; // [5, 3]
+        this.children = []; // [Rood, Blauw]
         var bags = rule.split(/ contain |, /);
         var bagString = bags[0].split(' ');
         bagString.pop();
@@ -31,6 +32,7 @@ var BagRule = /** @class */ (function () {
             for (var i = 1; i < bags.length; i++) {
                 var bagSplit = bags[i].split(' ');
                 this.childrenNames.push(bagSplit[1] + " " + bagSplit[2]);
+                this.childrenAmounts.push(Number(bagSplit[0]));
             }
         }
     }
@@ -49,6 +51,21 @@ var BagRule = /** @class */ (function () {
             });
         }
         return containsColor;
+    };
+    // Ik begin met 0 bags voor m'n golden bag. 
+    BagRule.prototype.countAllBags = function () {
+        var numBags = 0;
+        if (this.children.length === 0) { // Als ik geen kinderen heb, tel mezelf.
+            return 1;
+        }
+        else {
+            // 3 rode   &  2 oranje
+            for (var i = 0; i < this.childrenAmounts.length; i++) {
+                numBags += this.childrenAmounts[i] * this.children[i].countAllBags();
+            }
+            numBags++;
+        }
+        return numBags;
     };
     return BagRule;
 }());

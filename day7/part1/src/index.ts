@@ -8,18 +8,24 @@ function advent() {
 }
 
 
-
 function findBagColorsContainingGold(rules: string[]){
   const bagRules: BagRule[] = parseRules(rules);
+
   let numBagsContainingGold: number = 0;
+  let bagsNeeded: number = 0;
 
   bagRules.forEach((bagRule: BagRule) => {
     if(bagRule.checkIfContainsColor("shiny gold")){
       numBagsContainingGold++;
     }
+
+    if(bagRule.name === "shiny gold"){
+      bagsNeeded = bagRule.countAllBags() - 1;
+    }
   })
 
   console.log("Answer part one", numBagsContainingGold);
+  console.log("I need to own this many bags", bagsNeeded);
 }
 
 advent();

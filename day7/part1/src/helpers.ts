@@ -23,18 +23,20 @@ export function parseRules(rules: string[]) {
 export class BagRule{
   name: string = "";
   childrenNames: string[] = [];
-  children: BagRule[] = [];
+  childrenAmounts: number[] = [];  // [5, 3]
+  children: BagRule[] = [];   // [Rood, Blauw]
 
   constructor(rule: string){
     let bags = rule.split(/ contain |, /);
     let bagString = bags[0].split(' ');
     bagString.pop();
     this.name = bagString[0] + " " + bagString[1];
-
+    
     if(bags[1] !== 'no other bags.'){
       for(let i = 1; i < bags.length; i++){
         let bagSplit: string[] = bags[i].split(' ');
         this.childrenNames.push(bagSplit[1] + " " + bagSplit[2]);
+        this.childrenAmounts.push(Number(bagSplit[0]));
       }
     }
   }
@@ -57,5 +59,22 @@ export class BagRule{
     }
 
     return containsColor;
+  }
+
+
+  countAllBags(){
+    let numBags = 0;
+
+    if(this.children.length === 0){  // 
+      return 1;
+    }
+    else{
+      for(let i = 0; i < this.childrenAmounts.length; i++){
+        numBags += this.childrenAmounts[i] * this.children[i].countAllBags();
+      }
+      numBags++;
+    }
+
+    return numBags;
   }
 }
