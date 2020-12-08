@@ -16,7 +16,7 @@ export default class BootComputer {
   start(){
     while(this.isRunning){
       const instr: any[] = this.instructions[this.pointer];
-      this.visitedPointers.push(this.pointer);       // Niet bij reference toch? Ook al is het een prop want number?
+      this.visitedPointers.push(this.pointer);
 
       switch (instr[0]){
         case 'nop':
@@ -36,7 +36,14 @@ export default class BootComputer {
 
       // After the pointer is updated, we now check if this pointer has already been visited before
       if(this.visitedPointers.includes(this.pointer)){
-        console.log("allready visited pointer: " + this.pointer);
+        // console.log("allready visited pointer: " + this.pointer);
+        this.isRunning = false;
+      }
+
+      // if the pointer is pointing at the first index outside of the scope of instructions,
+      // than the program has finished running correctly.
+      if(this.pointer === this.instructions.length){
+        console.log("Program ended correctly");
         this.isRunning = false;
       }
     }
