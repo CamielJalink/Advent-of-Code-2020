@@ -7,7 +7,8 @@ function advent() {
     return Number(stringNum);
   });
 
-  findFirstXmasNumber(input, 25);
+  const xmasNumber: number = findFirstXmasNumber(input, 25);
+  findEncryptionWeakness([3,9,8,4,2], 15);
 }
 
 advent();
@@ -15,6 +16,7 @@ advent();
 
 function findFirstXmasNumber(input: number[], preambleLength: number){ // preamble is length 5 for now.
   const preamble: number[] = [];
+  let xmasNumber: number = 0;
 
   for(let i = 0; i < preambleLength; i++){
     preamble[i] = i;
@@ -25,9 +27,40 @@ function findFirstXmasNumber(input: number[], preambleLength: number){ // preamb
 
     if(!isValidNumber(input, preamble, nextNum)){
       console.log("Invalid number found: " + nextNum);
+      xmasNumber = nextNum;
       break;
     }
 
     updatePreamble(preamble);
   }
+  return xmasNumber;
 }
+
+
+function findEncryptionWeakness(input: number[], attempt: number[], target: number){
+
+  for(let i = 0; i < input.length; i++){
+
+    if(input[i] < target){
+      attempt.push(input[i])
+      let res = recursiveCheck(input, attempt, target);
+      if(res === [-1]){
+        console.log("AWWW YISS")
+      }
+    }
+  }
+}
+
+
+
+          // - Probeer de vergelijking niet met hetzelfde getal, dus niet input[i] + input2[i];
+
+          // Als alles in attempt + input2[i] === target.
+            // Jay, we got em!
+
+          // Als alles in attempt + input2[i] > target
+            // deze is het niet, doe input2[i+1]
+          
+          // Else
+            // Voeg input2[i] toe aan 'attempt'
+            // Stap een laag dieper (recursie)

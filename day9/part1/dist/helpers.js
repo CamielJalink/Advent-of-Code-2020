@@ -23,7 +23,3 @@ function isValidNumber(input, preamble, target) {
     return targetIsValid;
 }
 exports.isValidNumber = isValidNumber;
-// TODOs voor part1: 
-// Longs nodig
-// Pakte hij het laatste getal ook mee? (Weer even met testinput bekijken)
-// Ik kan eventueel checken of longs nodig zijn door te kijken of een getal > Number.MAX_SAFE_INTEGER
