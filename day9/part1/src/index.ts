@@ -8,13 +8,13 @@ function advent() {
   });
 
   const xmasNumber: number = findFirstXmasNumber(input, 25);
-  findEncryptionWeakness([3,9,8,4,2], 15);
+  findEncryptionWeakness(input, xmasNumber);
 }
 
 advent();
 
 
-function findFirstXmasNumber(input: number[], preambleLength: number){ // preamble is length 5 for now.
+function findFirstXmasNumber(input: number[], preambleLength: number){
   const preamble: number[] = [];
   let xmasNumber: number = 0;
 
@@ -37,30 +37,50 @@ function findFirstXmasNumber(input: number[], preambleLength: number){ // preamb
 }
 
 
-function findEncryptionWeakness(input: number[], attempt: number[], target: number){
+function findEncryptionWeakness(input: number[], target: number){
+  let foundNumbers: boolean = false;
+  let attempt: number[] = [];
 
   for(let i = 0; i < input.length; i++){
+    attempt = [];
+    attempt.push(input[i]);
 
-    if(input[i] < target){
-      attempt.push(input[i])
-      let res = recursiveCheck(input, attempt, target);
-      if(res === [-1]){
-        console.log("AWWW YISS")
+    for(let j = 0; j < input.length; j++){
+      if(j > i){
+        let attemptSum: number = 0;
+        attempt.forEach((num: number) => attemptSum += num);
+
+        if(attemptSum + input[j] > target){
+          break;
+        }
+        else if(attemptSum + input[j] === target){
+          attempt.push(input[j]);
+          foundNumbers = true; 
+          break;
+        }
+        else{
+          attempt.push(input[j]);
+        }
       }
     }
+
+    if(foundNumbers){
+      break;
+    }
   }
+
+  console.log("correct numbers found are in this attempt:" + attempt);
+  let lowestNum: number = attempt[0];
+  let highestNum: number = attempt[0];
+  attempt.forEach((num: number) => {
+    if(num > highestNum){
+      highestNum = num;
+    }
+    if(num < lowestNum){
+      lowestNum = num;
+    }
+  })
+
+  const encryptionWeakness = lowestNum + highestNum;
+  console.log("Encryption weakness is: " + encryptionWeakness);
 }
-
-
-
-          // - Probeer de vergelijking niet met hetzelfde getal, dus niet input[i] + input2[i];
-
-          // Als alles in attempt + input2[i] === target.
-            // Jay, we got em!
-
-          // Als alles in attempt + input2[i] > target
-            // deze is het niet, doe input2[i+1]
-          
-          // Else
-            // Voeg input2[i] toe aan 'attempt'
-            // Stap een laag dieper (recursie)

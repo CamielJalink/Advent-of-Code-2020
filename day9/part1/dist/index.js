@@ -29,45 +29,48 @@ function findFirstXmasNumber(input, preambleLength) {
     return xmasNumber;
 }
 function findEncryptionWeakness(input, target) {
+    var foundNumbers = false;
+    var attempt = [];
     for (var i = 0; i < input.length; i++) {
-        var attempt = [];
-        if (input[i] < target) {
-            attempt.push(input[i]);
-            var res = recursiveCheck(input, attempt, target);
-            if (res === [-1]) {
-                console.log("AWWW YISS");
+        attempt = [];
+        attempt.push(input[i]);
+        var _loop_1 = function (j) {
+            if (j > i) {
+                var attemptSum_1 = 0;
+                attempt.forEach(function (num) { return attemptSum_1 += num; });
+                if (attemptSum_1 + input[j] > target) {
+                    return "break";
+                }
+                else if (attemptSum_1 + input[j] === target) {
+                    attempt.push(input[j]);
+                    foundNumbers = true;
+                    return "break";
+                }
+                else {
+                    attempt.push(input[j]);
+                }
             }
+        };
+        for (var j = 0; j < input.length; j++) {
+            var state_1 = _loop_1(j);
+            if (state_1 === "break")
+                break;
+        }
+        if (foundNumbers) {
+            break;
         }
     }
-}
-function recursiveCheck(input, attempt, target) {
-    input.forEach(function (num) {
-        var doneWithLoop = false;
-        if (!attempt.includes(num)) { // Numbers already in attempt can't be used again.
-            var attemptSoFar = attempt.reduce(function (acc, nextNum) { return acc + nextNum; });
-            if (attemptSoFar + num === target) {
-                console.log("YES WE GOT EM");
-                console.log(attempt);
-                console.log("Don't forget to find out the answer bubby");
-                doneWithLoop = true;
-            }
-            else if (attemptSoFar + num < target) { // We zijn er nog niet, maar zou nog kunnen!
-                attempt.push(num);
-                recursiveCheck(input, attempt, target);
-            }
-            else if (attemptSoFar + num > target) { // Dit recente getal is 't niet, maar we gaan door binnen deze loop.
-                // met het afgelopen getal werkte het iig niet
-                attempt.pop();
-            }
+    console.log("correct numbers found are in this attempt:" + attempt);
+    var lowestNum = attempt[0];
+    var highestNum = attempt[0];
+    attempt.forEach(function (num) {
+        if (num > highestNum) {
+            highestNum = num;
+        }
+        if (num < lowestNum) {
+            lowestNum = num;
         }
     });
-    return attempt;
+    var encryptionWeakness = lowestNum + highestNum;
+    console.log("Encryption weakness is: " + encryptionWeakness);
 }
-// - Probeer de vergelijking niet met hetzelfde getal, dus niet input[i] + input2[i];
-// Als alles in attempt + input2[i] === target.
-// Jay, we got em!
-// Als alles in attempt + input2[i] > target
-// deze is het niet, doe input2[i+1]
-// Else
-// Voeg input2[i] toe aan 'attempt'
-// Stap een laag dieper (recursie)
