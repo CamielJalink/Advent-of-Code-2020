@@ -18,6 +18,37 @@ var Tile = /** @class */ (function () {
         });
         return numFilledNeighbors;
     };
+    Tile.prototype.countFilledDirectionSeats = function () {
+        var _this = this;
+        var numFilledDirectionSeats = 0;
+        var possibleDirections = [[1, 0], [-1, 0], [0, -1], [0, 1], [1, 1], [-1, 1], [1, -1], [-1, -1]];
+        possibleDirections.forEach(function (direction) {
+            var numChairsInDirection = _this.checkDirection(direction[0], direction[1]);
+            numFilledDirectionSeats += numChairsInDirection;
+        });
+        return numFilledDirectionSeats;
+    };
+    // Check the neighbor in that direction. If he/she exists and isn't filled, ask him/her to do the same
+    Tile.prototype.checkDirection = function (xDir, yDir) {
+        var _this = this;
+        var directionNeighbor;
+        //find the neighbor in that direction.
+        this.neighbors.forEach(function (neighbor) {
+            if (_this.x + xDir === neighbor.x && _this.y + yDir === neighbor.y) {
+                directionNeighbor = neighbor;
+            }
+        });
+        // If there is no neighbor in that direction, return 0
+        if (directionNeighbor === undefined || directionNeighbor.state === 'L') {
+            return 0;
+        }
+        else if (directionNeighbor.state === '#') {
+            return 1;
+        }
+        else { // If the neighbor exists, but is a '.'
+            return directionNeighbor.checkDirection(xDir, yDir);
+        }
+    };
     return Tile;
 }());
 exports.Tile = Tile;

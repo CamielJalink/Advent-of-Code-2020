@@ -7,9 +7,9 @@ function advent() {
     var input = stringInput.split("\r\n");
     var tiles = tiles_1.createTiles(input);
     findFilledSeats(tiles);
+    findFilledSeatsPart2(tiles);
 }
 function findFilledSeats(tiles) {
-    var turns = 0;
     var stillChanging = true;
     var _loop_1 = function () {
         tiles.forEach(function (tile) {
@@ -30,10 +30,40 @@ function findFilledSeats(tiles) {
         if (!somethingChanged) {
             stillChanging = false;
         }
-        turns++;
     };
     while (stillChanging) {
         _loop_1();
+    }
+    countTakenChairs(tiles);
+}
+function findFilledSeatsPart2(tiles) {
+    var stillChanging = true;
+    var _loop_2 = function () {
+        tiles.forEach(function (tile) {
+            if (tile.state === 'L' && tile.countFilledDirectionSeats() === 0) {
+                tile.nextState = '#';
+            }
+            else if (tile.state === '#' && tile.countFilledDirectionSeats() > 4) {
+                tile.nextState = 'L';
+            }
+            else {
+                tile.nextState = tile.state;
+            }
+        });
+        // drawTiles(tiles);
+        var somethingChanged = false;
+        tiles.forEach(function (tile) {
+            if (tile.state !== tile.nextState) {
+                tile.state = tile.nextState;
+                somethingChanged = true;
+            }
+        });
+        if (!somethingChanged) {
+            stillChanging = false;
+        }
+    };
+    while (stillChanging) {
+        _loop_2();
     }
     countTakenChairs(tiles);
 }
@@ -45,5 +75,19 @@ function countTakenChairs(tiles) {
         }
     });
     console.log(chairsTaken);
+}
+function drawTiles(tiles) {
+    var grid = [];
+    tiles.forEach(function (tile) {
+        if (grid[tile.y] === undefined) {
+            grid[tile.y] = tile.state;
+        }
+        else {
+            grid[tile.y] += tile.state;
+        }
+    });
+    grid.forEach(function (row) {
+        console.log(row);
+    });
 }
 advent();

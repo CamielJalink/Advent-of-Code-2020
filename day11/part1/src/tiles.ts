@@ -20,6 +20,43 @@ export class Tile{
     })
     return numFilledNeighbors;
   }
+
+
+  countFilledDirectionSeats(){
+    let numFilledDirectionSeats: number = 0;
+    let possibleDirections: number[][] = [[1, 0], [-1, 0], [0, -1], [0, 1], [1, 1], [-1, 1], [1, -1], [-1, -1]]
+
+    possibleDirections.forEach((direction: number[]) => {
+      let numChairsInDirection: number = this.checkDirection(direction[0], direction[1]);
+      numFilledDirectionSeats += numChairsInDirection;
+    })
+
+    return numFilledDirectionSeats;
+  }
+
+
+  // Check the neighbor in that direction. If he/she exists and isn't filled, ask him/her to do the same
+  checkDirection(xDir: number, yDir: number): number{
+    let directionNeighbor: Tile;
+
+    //find the neighbor in that direction.
+    this.neighbors.forEach((neighbor: Tile) => {
+      if(this.x + xDir === neighbor.x && this.y + yDir === neighbor.y){
+        directionNeighbor = neighbor;
+      }
+    })
+
+    // If there is no neighbor in that direction, return 0
+    if(directionNeighbor! === undefined || directionNeighbor.state === 'L'){
+      return 0;
+    }
+    else if(directionNeighbor.state === '#'){
+      return 1;
+    }
+    else{ // If the neighbor exists, but is a '.'
+      return directionNeighbor.checkDirection(xDir, yDir);
+    }
+  }
 }
 
 
