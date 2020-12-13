@@ -15,22 +15,24 @@ function parseCommands(stringCommands) {
 exports.parseCommands = parseCommands;
 var Ferry = /** @class */ (function () {
     function Ferry() {
-        this.direction = 'E';
         this.x = 0;
         this.y = 0;
+        this.wpX = 10;
+        this.wpY = 1;
     }
     Ferry.prototype.goNorth = function (amount) {
-        this.y += amount;
+        this.wpY += amount;
     };
     Ferry.prototype.goSouth = function (amount) {
-        this.y -= amount;
+        this.wpY -= amount;
     };
     Ferry.prototype.goEast = function (amount) {
-        this.x += amount;
+        this.wpX += amount;
     };
     Ferry.prototype.goWest = function (amount) {
-        this.x -= amount;
+        this.wpX -= amount;
     };
+    // Action L means to rotate the waypoint around the ship left(counter - clockwise) the given number of degrees.  
     Ferry.prototype.goLeft = function (amount) {
         var numberOfturns = amount / 90; // 1, 2 or 3
         for (var i = 0; i < numberOfturns; i++) {
@@ -38,22 +40,10 @@ var Ferry = /** @class */ (function () {
         }
     };
     Ferry.prototype.turnLeft = function () {
-        switch (this.direction) {
-            case 'N':
-                this.direction = 'W';
-                break;
-            case 'S':
-                this.direction = 'E';
-                break;
-            case 'W':
-                this.direction = 'S';
-                break;
-            case 'E':
-                this.direction = 'N';
-                break;
-            default:
-                throw new Error('that is not a valid value for this.direction');
-        }
+        var currWpX = this.wpX;
+        var currWpY = this.wpY;
+        this.wpX = -1 * currWpY;
+        this.wpY = currWpX;
     };
     Ferry.prototype.goRight = function (amount) {
         var numberOfturns = amount / 90; // 1, 2 or 3
@@ -62,40 +52,19 @@ var Ferry = /** @class */ (function () {
         }
     };
     Ferry.prototype.turnRight = function () {
-        switch (this.direction) {
-            case 'N':
-                this.direction = 'E';
-                break;
-            case 'S':
-                this.direction = 'W';
-                break;
-            case 'W':
-                this.direction = 'N';
-                break;
-            case 'E':
-                this.direction = 'S';
-                break;
-            default:
-                throw new Error('that is not a valid value for this.direction');
-        }
+        var currWpX = this.wpX;
+        var currWpY = this.wpY;
+        this.wpX = currWpY;
+        this.wpY = -1 * currWpX;
     };
     Ferry.prototype.goForward = function (amount) {
-        switch (this.direction) {
-            case 'N':
-                this.goNorth(amount);
-                break;
-            case 'S':
-                this.goSouth(amount);
-                break;
-            case 'E':
-                this.goEast(amount);
-                break;
-            case 'W':
-                this.goWest(amount);
-                break;
-            default:
-                throw new Error('go forward is attempted without a valid direction in "this.direction"');
-        }
+        // console.log("Before adding amount: " + this.x + "," + this.y)
+        // console.log("amount is: " + amount);
+        // console.log("Before adding amount, waypoint is now at " + this.wpX + "," + this.wpY);
+        this.x = this.x + (amount * this.wpX);
+        this.y = this.y + (amount * this.wpY);
+        // console.log("After this step, ship is now at: " + this.x + "," + this.y);
+        // console.log("After this step, waypoint is now at " + this.wpX + "," + this.wpY);
     };
     return Ferry;
 }());
