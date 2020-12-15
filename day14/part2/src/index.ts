@@ -1,5 +1,5 @@
 import { readFileSync } from "fs";
-import { applyMaskToDecimal } from "./helpers";
+import { applyMaskToMemory } from "./helpers";
 
 function advent() {
   const stringInput: string = readFileSync("input.txt", "utf-8");
@@ -9,23 +9,46 @@ function advent() {
 
 
 function parseInstructions(input: string[]){
-  let memory: number[] = [];
+  const memory: Memory[] = [];
   let currentMask: string;
   
   input.forEach((line: string) => {
-    let lineProps: string[] = line.split(" = ");
+    const lineProps: string[] = line.split(" = ");
     if(lineProps[0] === 'mask'){
       currentMask = lineProps[1];
     }
     else{
-      const targetMemory = Number(lineProps[0].match(/\d+/)); // Find the memory slot that we want to overwrite
+      const targetMemory = Number(lineProps[0].match(/\d+/));
       const decimalValue = Number(lineProps[1]);
-      memory[targetMemory] = applyMaskToDecimal(currentMask, decimalValue);
+      const memoryTargets: number[] = applyMaskToMemory(currentMask, targetMemory);
+
+      memoryTargets.forEach((num: number) => {
+        let numIndexExists: boolean = false;
+        for(let i = 0; i < memory.length; i++){
+          if(memory[i].index === num){
+            memory[i].value = decimalValue;
+            numIndexExists = true;
+            break;
+          }
+        }
+        if(!numIndexExists){
+          memory.push({index: num, value: decimalValue})
+        }
+      })
     }
   });
 
-  let sumInMemory: number = memory.reduce((acc:number, num:number) => acc + num);
+  let sumInMemory: number = 0;
+  memory.forEach((memory: Memory) => {
+    sumInMemory += memory.value;
+  })
   console.log("All values in memory put together are: ", sumInMemory);
+}
+
+
+interface Memory{
+  index: number,
+  value: number
 }
 
 
