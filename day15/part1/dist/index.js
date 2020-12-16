@@ -8,17 +8,11 @@ function advent() {
     playGame(input);
 }
 function playGame(gameNumbers) {
-    var spokenBefore = [];
+    var spokenBefore = new Map();
     for (var i = 0; i < gameNumbers.length - 1; i++) { // This '-1' is a real purrty magic number...
-        spokenBefore.push({
-            num: gameNumbers[i],
-            turnSpokenLast: i + 1
-        });
+        spokenBefore.set(gameNumbers[i], i + 1);
     }
     for (var turn = gameNumbers.length; turn < 30000000; turn++) { // We don't start in turn 1, since we first speak start numbers
-        if (turn % 100000 === 0) {
-            console.log("now at turn " + turn);
-        }
         var lastSpoken = gameNumbers[gameNumbers.length - 1];
         var nextNumber = helpers_1.addToSpokenBefore(spokenBefore, lastSpoken, turn);
         gameNumbers.push(nextNumber);
