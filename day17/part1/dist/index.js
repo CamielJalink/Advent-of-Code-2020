@@ -5,8 +5,13 @@ var cube_1 = require("./cube");
 function advent() {
     var stringInput = fs_1.readFileSync("input.txt", "utf-8");
     var input = stringInput.split("\r\n");
-    var map = [];
-    cube_1.createInitialCubes(input, map);
-    console.log(map);
+    var map = new cube_1.Map(input);
+    activeAfter6Cycles(map);
+}
+function activeAfter6Cycles(map) {
+    for (var i = 0; i < 6; i++) {
+        map.cycle();
+    }
+    console.log(map.countActive());
 }
 advent();

@@ -1,14 +1,20 @@
 import { readFileSync } from "fs";
-import { createInitialCubes, Cube } from "./cube";
+import { Map } from "./cube";
 
 function advent() {
   const stringInput: string = readFileSync("input.txt", "utf-8");
   const input: string[] = stringInput.split("\r\n");
-  let map: Cube[] = [];
-  createInitialCubes(input, map);
-  console.log(map);
+  const map = new Map(input);
+  activeAfter6Cycles(map);
 }
 
+
+function activeAfter6Cycles(map: Map){
+  for(let i = 0; i < 6; i++){
+    map.cycle();
+  }
+  console.log(map.countActive());
+}
 
 
 advent();
