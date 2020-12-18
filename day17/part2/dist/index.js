@@ -11,6 +11,7 @@ function advent() {
 function activeAfter6Cycles(map) {
     for (var i = 0; i < 6; i++) {
         map.cycle();
+        console.log('finished turn ' + i);
     }
     console.log(map.countActive());
 }

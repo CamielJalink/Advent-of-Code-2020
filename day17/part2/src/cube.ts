@@ -3,13 +3,15 @@ export class Cube{
   x: number;
   y: number;
   z: number;
+  w: number;
   state: string;
   nextState: string = '';
 
-  constructor(x: number, y: number, z:number, state: string){
+  constructor(x: number, y: number, z:number, w: number, state: string){
     this.x = x;
     this.y = y;
     this.z = z;
+    this.w = w;
     this.state = state;
   }
 
@@ -46,7 +48,7 @@ export class Map {
   constructor(input: string[]) {
     for (let y = 0; y < input.length; y++) {
       for (let x = 0; x < input[y].length; x++) {
-        this.knownMap.push(new Cube(x, y, 0, input[y][x]));
+        this.knownMap.push(new Cube(x, y, 0, 0, input[y][x]));
       }
     }
     this.populateNeededNeighbors();
@@ -54,12 +56,12 @@ export class Map {
 
 
   // Find the neighbor cube with these coordinates
-  findCube(x: number, y: number, z: number): Cube {
-    let neighborCube: Cube = new Cube(x, y, z, '.');
+  findCube(x: number, y: number, z: number, w: number): Cube {
+    let neighborCube: Cube = new Cube(x, y, z, w, '.');
 
     for(let i = 0; i < this.knownMap.length; i++){
       const cube = this.knownMap[i];
-      if (cube.x === x && cube.y === y && cube.z === z) {
+      if (cube.x === x && cube.y === y && cube.z === z && cube.w === w) {
         neighborCube = cube;
         break;
       }
@@ -77,17 +79,19 @@ export class Map {
     })
 
     currentlyKnownMap.forEach((cube: Cube) => {
-      if(cube.neighbors.length !== 26){
+      if(cube.neighbors.length !== 80){
 
         for(let x = cube.x - 1; x <= cube.x + 1; x++){
           for(let y = cube.y - 1; y <= cube.y + 1; y++){
             for (let z = cube.z - 1; z <= cube.z + 1; z++){
-              if(!(x === cube.x && y === cube.y && z === cube.z)){ // you can't be your own neighbor don't be silly
-                const neighbor = this.findCube(x, y, z);
-                cube.neighbors.push(neighbor);
+              for (let w = cube.w - 1; w <= cube.w + 1; w++){
+                if (!(x === cube.x && y === cube.y && z === cube.z && w === cube.w)) { // you can't be your own neighbor don't be silly
+                  const neighbor = this.findCube(x, y, z, w);
+                  cube.neighbors.push(neighbor);
 
-                if(!this.knownMap.includes(neighbor)){
-                  this.knownMap.push(neighbor);
+                  if (!this.knownMap.includes(neighbor)) {
+                    this.knownMap.push(neighbor);
+                  }
                 }
               }
             }
