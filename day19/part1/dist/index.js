@@ -11,10 +11,19 @@ function advent() {
         return new helpers_1.Rule(stringRule);
     });
     var startingRule = helpers_1.connectRules(rules);
-    checkMessageValidity(startingRule, messages);
-    console.log(rules[4]);
+    // console.log(rules[0]);
+    // console.log(rules[1]);
+    checkMessageValidity(startingRule, rules, messages);
 }
-function checkMessageValidity(startingRule, messages) {
-    console.log(startingRule.childRules[0]);
+function checkMessageValidity(startingRule, rules, messages) {
+    var allAnswers = startingRule.createValidAnswers();
+    var numValidMessages = 0;
+    messages.forEach(function (message) {
+        if (allAnswers.includes(message)) {
+            numValidMessages++;
+        }
+    });
+    console.log(allAnswers);
+    console.log("Number of valid messages: ", numValidMessages);
 }
 advent();
