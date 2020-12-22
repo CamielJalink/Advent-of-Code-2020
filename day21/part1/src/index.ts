@@ -1,63 +1,64 @@
 import { readFileSync } from "fs";
-import { Food } from "./helpers";
+import { Food, Allergen } from "./helpers";
 
 function advent() {
   const stringInput: string = readFileSync("input.txt", "utf-8");
-  const input: string[] = stringInput.split("\r\n");
+  const foodStrings: string[] = stringInput.split("\r\n");
 
-  const foods: Food[] = input.map((foodString: string) => new Food(foodString));
-  findIngredients(foods);
+  const foods: Food[] = [];
+  const allStringAllergens: Set<string> = new Set();
+  const allIngredients: Set<string> = new Set();
+
+
+  foodStrings.forEach((foodString: string) => {
+    const ingredientsAndAllergens = foodString.split(' (contains ');
+    
+    const stringAllergens = ingredientsAndAllergens[1].split(', ');
+    const l = stringAllergens.length - 1;
+    stringAllergens[l] = stringAllergens[l].substring(0, stringAllergens[l].length - 1);
+    stringAllergens.forEach((stringAllergen: string) => {
+      allStringAllergens.add(stringAllergen);
+    })
+
+    const ingredients: string[] = ingredientsAndAllergens[0].split(' ');
+    ingredients.forEach((ingredient: string) => {
+      allIngredients.add(ingredient);
+    })
+
+    foods.push(new Food(stringAllergens, ingredients));
+  })
+
+
+  const allergens: Set<Allergen> = new Set();
+  allStringAllergens.forEach((stringAllergen) => {
+    let allergen = new Allergen(stringAllergen, allIngredients);
+    const foodsWithAllergen: Food[] = [];
+    foods.forEach((food: Food) => {
+      if(food.allergens.includes(stringAllergen)){
+        foodsWithAllergen.push(food);
+      }
+    })
+    allergen.foods = foodsWithAllergen;
+    allergens.add(allergen);
+  })
+
+
+  findIngredientsWithoutAllergens(allergens);
 }
 
 
-function findIngredients(foods: Food[]){
-  let ingrAllerMap: Map<string, string> = new Map();
-  let allAllergens: Set<string> = new Set();
+function findIngredientsWithoutAllergens(allergens: Set<Allergen>){
 
-  foods.forEach((food: Food) => {
-    food.allergens.forEach((allergen: string) => {
-      allAllergens.add(allergen);
-    })
-  })
+  // Voor elk allergen.
 
-  let safeIncrement: number = 0;
-  while(allAllergens.size > 0 && safeIncrement < 100){
+    // Dit zou een method kunnen zijn: 
+    // Maar mogelijk moeten we uiteindelijk deze lijsten ook bijwerken adhv andere allergens...
 
-    allAllergens.forEach((allergen: string) => {
-      let allPossibleIngredients: Set<string> = new Set();
-      
-      foods.forEach((food: Food) => {
-        if(food.allergens.includes(allergen)){
-          food.ingredients.forEach((ingredient: string) => {
-            allPossibleIngredients.add(ingredient);
-          })
-        }
-      })
+    // Voor elk van diens ingredients
+      // Voor elk van allergen z'n foods
+      // Als ingredient in ELKE food zit, blijft het relevant. Elke food heeft immers deze allergen.
+      // Dus: Zodra een food NIET een ingredient heeft, gooi 'm uit allergen z'n set.
 
-      allPossibleIngredients.forEach((ingredient: string) => {
-        let couldBeMatch: boolean = true;
-
-        foods.forEach((food: Food) => {
-          if (food.allergens.includes(allergen)) {
-            food.ingredients.forEach((foodIngredient: string) => {
-              
-            })
-          }
-        })
-      })
-
-      }
-      console.log(allergen);
-    })
-
-
-    safeIncrement++;
-  }
-
-
-
-
-  console.log(allAllergens);
 }
 
 

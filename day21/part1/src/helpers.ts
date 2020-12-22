@@ -2,11 +2,20 @@ export class Food{
   ingredients: string[];
   allergens: string[];
 
-  constructor(foodString: string){
-    const ingredientsAndAllergens = foodString.split(' (contains ');
-    this.ingredients = ingredientsAndAllergens[0].split(' ');
-    this.allergens = ingredientsAndAllergens[1].split(', ');
-    const l = this.allergens.length - 1;
-    this.allergens[l] = this.allergens[l].substring(0, this.allergens[l].length-1);
+  constructor(stringAllergens: string[], ingredients: string[]){
+    this.allergens = stringAllergens;
+    this.ingredients = ingredients;
+  }
+}
+
+
+export class Allergen{
+  name: string;
+  ingredients: Set<string>;
+  foods: Food[] = [];
+
+  constructor(name: string, ingredients: Set<string>){
+    this.name = name;
+    this.ingredients = ingredients;
   }
 }
