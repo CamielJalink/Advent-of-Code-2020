@@ -122,7 +122,6 @@ function findIngredientsWithoutAllergens(allergens: Set<Allergen>, allIngredient
     })
   })
 
-  console.log(allergenIngredientMap);
   console.log(safeIngredients);
 
 
@@ -138,6 +137,19 @@ function findIngredientsWithoutAllergens(allergens: Set<Allergen>, allIngredient
   })
 
   console.log("Number of safe occurences: ", numSafeOccurences);
+
+
+
+  console.log(allergenIngredientMap);
+  let sortedMap = new Map([...allergenIngredientMap.entries()].sort());
+  console.log(sortedMap);
+
+  let canonicalList: string = '';
+  sortedMap.forEach((value: string) => {
+    canonicalList = canonicalList + "," + value;
+  })
+
+  console.log(canonicalList);
 }
 
 
