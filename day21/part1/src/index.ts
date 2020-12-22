@@ -31,7 +31,7 @@ function advent() {
 
   const allergens: Set<Allergen> = new Set();
   allStringAllergens.forEach((stringAllergen) => {
-    let allergen = new Allergen(stringAllergen, allIngredients);
+    const allergen = new Allergen(stringAllergen, new Set(allIngredients)); // ...by reference, so new Set
     const foodsWithAllergen: Food[] = [];
     foods.forEach((food: Food) => {
       if(food.allergens.includes(stringAllergen)){
@@ -43,22 +43,101 @@ function advent() {
   })
 
 
-  findIngredientsWithoutAllergens(allergens);
+  findIngredientsWithoutAllergens(allergens, allIngredients, foods);
 }
 
 
-function findIngredientsWithoutAllergens(allergens: Set<Allergen>){
+function findIngredientsWithoutAllergens(allergens: Set<Allergen>, allIngredients: Set<string>, foods: Food[]){
 
-  // Voor elk allergen.
+  const allergenIngredientMap: Map<string, string> = new Map();
 
-    // Dit zou een method kunnen zijn: 
-    // Maar mogelijk moeten we uiteindelijk deze lijsten ook bijwerken adhv andere allergens...
+  let stillSearching: boolean = true;
+  while (stillSearching) {
+    let ingredientsToRemove: string[] = [];
+    stillSearching = false;
 
-    // Voor elk van diens ingredients
-      // Voor elk van allergen z'n foods
-      // Als ingredient in ELKE food zit, blijft het relevant. Elke food heeft immers deze allergen.
-      // Dus: Zodra een food NIET een ingredient heeft, gooi 'm uit allergen z'n set.
+    allergens.forEach((allergen: Allergen) => {
+      console.log("Currently checking Allergen", allergen.name);
+      console.log("Currently have ingredients: ", allergen.ingredients);
 
+      // Find and remove ingredients that can't be the match.
+      allergen.ingredients.forEach((ingredient) => {
+        console.log("checking ingredient: ", ingredient);
+        let possibleMatch: boolean = true;
+
+        for(let i = 0; i < allergen.foods.length; i++){
+          if(allergen.foods[i].ingredients.includes(ingredient) === false){
+            possibleMatch = false;
+            break;
+          }
+        }
+
+        if(!possibleMatch){
+          console.log("deleting ingredient: ", ingredient);
+          allergen.ingredients.delete(ingredient);
+        }
+      })
+
+      console.log('--------------------------');
+
+      // If only one ingredient left, then that must be the cause of the allergen.
+      if(allergen.ingredients.size === 1){
+        const lastIngredient: string = Array.from(allergen.ingredients)[0];
+        allergenIngredientMap.set(allergen.name, lastIngredient);
+        ingredientsToRemove.push(lastIngredient);
+      }
+    })
+
+    console.log('--------------------------');
+    console.log('--------------------------');
+    console.log('--------------------------');
+
+
+    // this should break the loop, and needs to be done before we start removing ingredients from the allergens
+    allergens.forEach((allergen: Allergen) => {
+      if (allergen.ingredients.size > 1) {
+        stillSearching = true;
+      }
+    })
+
+    ingredientsToRemove.forEach((ingredient: string) => {
+      allergens.forEach((allergen: Allergen) => {
+        // If ingredients that are already matched by a previous allergen, are still listed as possible match for a different allergen, remove them.
+        if(allergen.ingredients.size > 1 && allergen.ingredients.has(ingredient)){
+          allergen.ingredients.delete(ingredient);
+        }
+      })
+    })
+    // ingredientsToRemove = [];     //  Deze zou ik kunnen legen, maar mogelijk wil ik 'm gewoon gelijk gebruiken? 
+  }
+
+
+  // Find all ingredients that are NOT mapped to a allergen
+  const safeIngredients: Set<string> = new Set(allIngredients);
+  allIngredients.forEach((ingredient: string) => {
+    allergenIngredientMap.forEach((value:string) => {
+      if(value === ingredient){
+        safeIngredients.delete(ingredient);
+      }
+    })
+  })
+
+  console.log(allergenIngredientMap);
+  console.log(safeIngredients);
+
+
+  // Count all occurences of safeIngredients;
+  let numSafeOccurences: number = 0;
+
+  foods.forEach((food: Food) => {
+    food.ingredients.forEach((ingredient: string) => {
+      if (safeIngredients.has(ingredient)) {
+        numSafeOccurences++;
+      }
+    })
+  })
+
+  console.log("Number of safe occurences: ", numSafeOccurences);
 }
 
 

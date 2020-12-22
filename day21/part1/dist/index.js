@@ -24,7 +24,7 @@ function advent() {
     });
     var allergens = new Set();
     allStringAllergens.forEach(function (stringAllergen) {
-        var allergen = new helpers_1.Allergen(stringAllergen, allIngredients);
+        var allergen = new helpers_1.Allergen(stringAllergen, new Set(allIngredients)); // ...by reference, so new Set
         var foodsWithAllergen = [];
         foods.forEach(function (food) {
             if (food.allergens.includes(stringAllergen)) {
@@ -34,42 +34,81 @@ function advent() {
         allergen.foods = foodsWithAllergen;
         allergens.add(allergen);
     });
-    console.log(allergens);
-    // findIngredients(foods);
+    findIngredientsWithoutAllergens(allergens, allIngredients, foods);
 }
-function findIngredients(foods) {
-    // let ingrAllerMap: Map<string, string> = new Map();
-    // let allAllergens: Set<string> = new Set();
-    // foods.forEach((food: Food) => {
-    //   food.allergens.forEach((allergen: string) => {
-    //     allAllergens.add(allergen);
-    //   })
-    // })
-    // let safeIncrement: number = 0;
-    // while(allAllergens.size > 0 && safeIncrement < 100){
-    //   allAllergens.forEach((allergen: string) => {
-    //     let allPossibleIngredients: Set<string> = new Set();
-    //     foods.forEach((food: Food) => {
-    //       if(food.allergens.includes(allergen)){
-    //         food.ingredients.forEach((ingredient: string) => {
-    //           allPossibleIngredients.add(ingredient);
-    //         })
-    //       }
-    //     })
-    //     allPossibleIngredients.forEach((ingredient: string) => {
-    //       let couldBeMatch: boolean = true;
-    //       foods.forEach((food: Food) => {
-    //         if (food.allergens.includes(allergen)) {
-    //           food.ingredients.forEach((foodIngredient: string) => {
-    //           })
-    //         }
-    //       })
-    //     })
-    //     })
-    //     console.log(allergen);
-    //   }
-    //   safeIncrement++;
-    // }
-    // console.log(allAllergens);
+function findIngredientsWithoutAllergens(allergens, allIngredients, foods) {
+    var allergenIngredientMap = new Map();
+    var stillSearching = true;
+    var _loop_1 = function () {
+        var ingredientsToRemove = [];
+        stillSearching = false;
+        allergens.forEach(function (allergen) {
+            console.log("Currently checking Allergen", allergen.name);
+            console.log("Currently have ingredients: ", allergen.ingredients);
+            // Find and remove ingredients that can't be the match.
+            allergen.ingredients.forEach(function (ingredient) {
+                console.log("checking ingredient: ", ingredient);
+                var possibleMatch = true;
+                for (var i = 0; i < allergen.foods.length; i++) {
+                    if (allergen.foods[i].ingredients.includes(ingredient) === false) {
+                        possibleMatch = false;
+                        break;
+                    }
+                }
+                if (!possibleMatch) {
+                    console.log("deleting ingredient: ", ingredient);
+                    allergen.ingredients.delete(ingredient);
+                }
+            });
+            console.log('--------------------------');
+            // If only one ingredient left, then that must be the cause of the allergen.
+            if (allergen.ingredients.size === 1) {
+                var lastIngredient = Array.from(allergen.ingredients)[0];
+                allergenIngredientMap.set(allergen.name, lastIngredient);
+                ingredientsToRemove.push(lastIngredient);
+            }
+        });
+        console.log('--------------------------');
+        console.log('--------------------------');
+        console.log('--------------------------');
+        // this should break the loop, and needs to be done before we start removing ingredients from the allergens
+        allergens.forEach(function (allergen) {
+            if (allergen.ingredients.size > 1) {
+                stillSearching = true;
+            }
+        });
+        ingredientsToRemove.forEach(function (ingredient) {
+            allergens.forEach(function (allergen) {
+                // If ingredients that are already matched by a previous allergen, are still listed as possible match for a different allergen, remove them.
+                if (allergen.ingredients.size > 1 && allergen.ingredients.has(ingredient)) {
+                    allergen.ingredients.delete(ingredient);
+                }
+            });
+        });
+    };
+    while (stillSearching) {
+        _loop_1();
+    }
+    // Find all ingredients that are NOT mapped to a allergen
+    var safeIngredients = new Set(allIngredients);
+    allIngredients.forEach(function (ingredient) {
+        allergenIngredientMap.forEach(function (value) {
+            if (value === ingredient) {
+                safeIngredients.delete(ingredient);
+            }
+        });
+    });
+    console.log(allergenIngredientMap);
+    console.log(safeIngredients);
+    // Count all occurences of safeIngredients;
+    var numSafeOccurences = 0;
+    foods.forEach(function (food) {
+        food.ingredients.forEach(function (ingredient) {
+            if (safeIngredients.has(ingredient)) {
+                numSafeOccurences++;
+            }
+        });
+    });
+    console.log("Number of safe occurences: ", numSafeOccurences);
 }
 advent();
