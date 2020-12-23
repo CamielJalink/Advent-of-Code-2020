@@ -14,18 +14,14 @@ var Player = /** @class */ (function () {
         }
         return score;
     };
-    // Player won a turn, keeps his card and receives a card
-    Player.prototype.handleWonTurn = function (prizeCard) {
-        var winningCard = this.cards[0];
+    Player.prototype.playCard = function () {
+        var card = this.cards[0];
         this.cards.shift();
-        this.cards.push(winningCard);
-        this.cards.push(prizeCard);
+        return card;
     };
-    // Player lost a turn so loses a card
-    Player.prototype.handleLostTurn = function () {
-        var cardPrize = this.cards[0];
-        this.cards.shift();
-        return cardPrize;
+    Player.prototype.wonCards = function (ownCard, prizeCard) {
+        this.cards.push(ownCard);
+        this.cards.push(prizeCard);
     };
     return Player;
 }());

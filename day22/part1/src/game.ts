@@ -17,7 +17,7 @@ export class Game{
   }
 
 
-  playUntilWinner(): number {
+  playUntilWinner(): string {
     while(this.inProgress){
       if (this.infiniteGameDetected()) {
         this.winner = this.player1;
@@ -39,7 +39,7 @@ export class Game{
         }
       }
     }
-    return this.winner.calculateScore();
+    return this.winner.name;
   }
 
 
@@ -85,15 +85,48 @@ export class Game{
 
   // Assumes two players for now.
   playTurn(): void{
-    let prizeCard: number;
+    const player1Card: number = this.player1.playCard();
+    const player2Card: number = this.player2.playCard();
+    let player1Wins: boolean = false;
 
-    if (this.player1.cards[0] > this.player2.cards[0]){ // player 1 wins
-      prizeCard = this.player2.handleLostTurn();
-      this.player1.handleWonTurn(prizeCard);
+    // Check the recursive game requirement.
+    if(this.player1.cards.length >= player1Card && this.player2.cards.length >= player2Card) {
+      player1Wins = this.playRecursiveGame(player1Card, player2Card);
     }
-    else if (this.player2.cards[0] > this.player1.cards[0]){
-      prizeCard = this.player1.handleLostTurn();
-      this.player2.handleWonTurn(prizeCard);
+    else{
+      // The non-recursive way of settling a round
+      if (player1Card > player2Card) {
+        player1Wins = true;
+      }
+      else if (player2Card > player1Card) {
+        player1Wins = false;
+      }
+    }
+
+    if(player1Wins){
+      this.player1.wonCards(player1Card, player2Card);
+    } else{
+      this.player2.wonCards(player2Card, player1Card);
+    }
+  }
+
+
+  playRecursiveGame(player1Card: number, player2Card: number): boolean{
+    const player1Hand: number[] = [];
+    const player2Hand: number[] = [];
+
+    for(let i = 0; i < player1Card; i++){
+      player1Hand.push(this.player1.cards[i]);
+    }
+    for (let i = 0; i < player2Card; i++) {
+      player2Hand.push(this.player2.cards[i]);
+    }
+
+    const subGame: Game = new Game(player1Hand, player2Hand);
+    if (subGame.playUntilWinner() === "Player 1"){
+      return true;
+    } else{
+      return false;
     }
   }
 }

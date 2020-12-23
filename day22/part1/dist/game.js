@@ -22,7 +22,6 @@ var Game = /** @class */ (function () {
     }
     Game.prototype.playUntilWinner = function () {
         while (this.inProgress) {
-            console.log("Another Loop in paradise");
             if (this.infiniteGameDetected()) {
                 this.winner = this.player1;
                 this.inProgress = false;
@@ -42,7 +41,7 @@ var Game = /** @class */ (function () {
                 }
             }
         }
-        return this.winner.calculateScore();
+        return this.winner.name;
     };
     Game.prototype.infiniteGameDetected = function () {
         var infiniteLoopDetected = false;
@@ -80,14 +79,45 @@ var Game = /** @class */ (function () {
     };
     // Assumes two players for now.
     Game.prototype.playTurn = function () {
-        var prizeCard;
-        if (this.player1.cards[0] > this.player2.cards[0]) { // player 1 wins
-            prizeCard = this.player2.handleLostTurn();
-            this.player1.handleWonTurn(prizeCard);
+        var player1Card = this.player1.playCard();
+        var player2Card = this.player2.playCard();
+        var player1Wins = false;
+        // Check the recursive game requirement.
+        if (this.player1.cards.length >= player1Card && this.player2.cards.length >= player2Card) {
+            player1Wins = this.playRecursiveGame(player1Card, player2Card);
+            console.log("A recursive game was played and won by player 1 if true: ", player1Wins);
         }
-        else if (this.player2.cards[0] > this.player1.cards[0]) {
-            prizeCard = this.player1.handleLostTurn();
-            this.player2.handleWonTurn(prizeCard);
+        else {
+            // The non-recursive way of settling a round
+            if (player1Card > player2Card) {
+                player1Wins = true;
+            }
+            else if (player2Card > player1Card) {
+                player1Wins = false;
+            }
+        }
+        if (player1Wins) {
+            this.player1.wonCards(player1Card, player2Card);
+        }
+        else {
+            this.player2.wonCards(player2Card, player1Card);
+        }
+    };
+    Game.prototype.playRecursiveGame = function (player1Card, player2Card) {
+        var player1Hand = [];
+        var player2Hand = [];
+        for (var i = 0; i < player1Card; i++) {
+            player1Hand.push(this.player1.cards[i]);
+        }
+        for (var i = 0; i < player2Card; i++) {
+            player2Hand.push(this.player2.cards[i]);
+        }
+        var subGame = new Game(player1Hand, player2Hand);
+        if (subGame.playUntilWinner() === "Player 1") {
+            return true;
+        }
+        else {
+            return false;
         }
     };
     return Game;

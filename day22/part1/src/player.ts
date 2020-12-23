@@ -18,19 +18,15 @@ export class Player {
   }
 
 
-  // Player won a turn, keeps his card and receives a card
-  handleWonTurn(prizeCard: number): void {
-    const winningCard: number = this.cards[0];
+  playCard(): number{
+    const card: number = this.cards[0];
     this.cards.shift();
-    this.cards.push(winningCard);
-    this.cards.push(prizeCard);
+    return card;
   }
 
 
-  // Player lost a turn so loses a card
-  handleLostTurn(): number {
-    const cardPrize = this.cards[0];
-    this.cards.shift();
-    return cardPrize;
+  wonCards(ownCard: number, prizeCard: number): void{
+    this.cards.push(ownCard);
+    this.cards.push(prizeCard);
   }
 }

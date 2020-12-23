@@ -11,8 +11,15 @@ function advent() {
   const player1Input: number[] = player1StringInput.map((stringCard: string) => Number(stringCard));
   const player2Input: number[] = player2StringInput.map((stringCard: string) => Number(stringCard));
   const game: Game = new Game(player1Input, player2Input);
-  const winningScore: number = game.playUntilWinner();
-  console.log(winningScore);
+  const winningPlayer: string = game.playUntilWinner();
+  if(winningPlayer === "Player 1"){
+    console.log("Player 1 won the game with ", game.player1.calculateScore(), " points");
+  } else if (winningPlayer === "Player 2"){
+    console.log("Player 2 won the game with ", game.player2.calculateScore(), " points");
+  }
+  else{
+    console.log("ERROR FOR ", winningPlayer);
+  }
 }
 
 
