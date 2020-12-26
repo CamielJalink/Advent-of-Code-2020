@@ -1,66 +1,92 @@
 "use strict";
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Game = void 0;
+var cup_1 = require("./cup");
 var Game = /** @class */ (function () {
     function Game(gameState) {
-        this.currentMove = 0;
-        this.gameState = gameState;
-        console.log(this.gameState);
+        var _this = this;
+        this.gameState = new Map();
+        this.pickedUpCups = [];
+        var tempGameState = [];
+        this.currentCup = new cup_1.Cup(gameState[0]);
+        tempGameState.push(this.currentCup);
+        for (var i = 1; i < gameState.length; i++) {
+            var cup = new cup_1.Cup(gameState[i]);
+            cup.prevCup = tempGameState[i - 1];
+            cup.prevCup.nextCup = cup;
+            tempGameState.push(cup);
+        }
+        tempGameState[0].prevCup = tempGameState[tempGameState.length - 1];
+        tempGameState[tempGameState.length - 1].nextCup = tempGameState[0];
+        tempGameState.forEach(function (cup) {
+            _this.gameState.set(cup.name, cup);
+        });
     }
     Game.prototype.playMove = function () {
-        var currentCup = this.gameState[0];
-        var pickedUpCups = this.gameState.slice(1, 4);
-        this.gameState = __spreadArrays([currentCup], this.gameState.slice(4));
-        var target = this.findTarget(currentCup, pickedUpCups);
-        this.insertIntoGamestate(target, pickedUpCups);
+        // Pick up three cups and close the circle behind them
+        this.pickUpCups();
+        // Find the target cup
+        var target = this.findTarget();
+        // Insert picked up cups behind the target and fix their references
+        this.insertIntoGamestate(target);
         // When the move is done, update the gameState.
-        currentCup = this.gameState.shift();
-        this.gameState.push(currentCup);
+        this.currentCup = this.currentCup.nextCup;
     };
-    Game.prototype.findTarget = function (currentCup, pickedUpCups) {
-        var target = currentCup - 1;
+    Game.prototype.pickUpCups = function () {
+        var cup1 = this.currentCup.nextCup;
+        var cup2 = cup1.nextCup;
+        var cup3 = cup2.nextCup;
+        var cup4 = cup3.nextCup;
+        this.pickedUpCups = [cup1, cup2, cup3];
+        // close the circle behind picked up cups;
+        this.currentCup.nextCup = cup4;
+        cup4.prevCup = this.currentCup;
+    };
+    Game.prototype.findTarget = function () {
+        var targetName = this.currentCup.name - 1;
         var stillSearching = true;
         while (stillSearching) {
-            if (target === 0) {
-                target = 9;
+            if (targetName === 0) {
+                targetName = 1000000;
             }
-            if (pickedUpCups.includes(target)) {
-                target = target - 1;
+            var targetInPickedUp = false;
+            for (var i = 0; i < this.pickedUpCups.length; i++) {
+                if (this.pickedUpCups[i].name === targetName) {
+                    targetInPickedUp = true;
+                }
+            }
+            if (targetInPickedUp) {
+                targetName = targetName - 1;
             }
             else {
                 stillSearching = false;
             }
         }
-        return target;
-    };
-    Game.prototype.insertIntoGamestate = function (targetCup, pickedUpCups) {
-        var newGameState = [];
-        for (var i = 0; i < this.gameState.length; i++) {
-            if (this.gameState[i] === targetCup) {
-                newGameState = __spreadArrays(this.gameState.slice(0, i + 1), pickedUpCups, this.gameState.slice(i + 1));
-                break;
-            }
+        var targetCup = new cup_1.Cup(-1);
+        var target = this.gameState.get(targetName);
+        if (target !== undefined) {
+            targetCup = target;
         }
-        this.gameState = newGameState;
+        return targetCup;
     };
-    Game.prototype.printState = function () {
-        console.log(this.gameState);
+    Game.prototype.insertIntoGamestate = function (targetCup) {
+        var cup1 = this.pickedUpCups[0];
+        var cup3 = this.pickedUpCups[2];
+        cup3.nextCup = targetCup.nextCup;
+        targetCup.nextCup = cup1;
+        cup1.prevCup = targetCup;
+        targetCup.nextCup.prevCup = cup3;
     };
-    Game.prototype.cupsAfter1 = function () {
-        var cupsAfter1 = [];
-        for (var i = 0; i < this.gameState.length; i++) {
-            if (this.gameState[i] === 1) {
-                cupsAfter1 = __spreadArrays(this.gameState.slice(i + 1), this.gameState.slice(0, i));
-            }
+    Game.prototype.findTwoCupsAfter1 = function () {
+        var cup1 = this.gameState.get(1);
+        console.log(cup1);
+        if (cup1 !== undefined) {
+            var cup2 = cup1.nextCup;
+            var cup3 = cup2.nextCup;
+            console.log(cup2);
+            console.log(cup3);
+            console.log(cup2.name * cup3.name);
         }
-        console.log("Starting from the 1 cup, cups are: ", cupsAfter1);
     };
     return Game;
 }());

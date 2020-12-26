@@ -1,70 +1,104 @@
+import { Cup } from "./cup";
+
 export class Game {
-  gameState: number[];
-  currentMove: number = 0;
+  gameState: Map<number, Cup> = new Map();
+  pickedUpCups: Cup[] = [];
+  currentCup: Cup;
   
   constructor(gameState: number[]){
-    this.gameState = gameState;
-    console.log(this.gameState);
+    const tempGameState: Cup[] = [];
+    this.currentCup = new Cup(gameState[0]);
+    tempGameState.push(this.currentCup);
+
+    for(let i = 1; i < gameState.length; i++){
+      const cup = new Cup(gameState[i]);
+      cup.prevCup = tempGameState[i - 1];
+      cup.prevCup.nextCup = cup;
+      tempGameState.push(cup);
+    }
+
+    tempGameState[0].prevCup = tempGameState[tempGameState.length-1];
+    tempGameState[tempGameState.length - 1].nextCup = tempGameState[0];
+
+    tempGameState.forEach((cup: Cup) => {
+      this.gameState.set(cup.name, cup);
+    })
   }
+
 
   playMove(): void{
-    let currentCup = this.gameState[0];
-    const pickedUpCups: number[] = this.gameState.slice(1,4);
-    this.gameState = [currentCup, ...this.gameState.slice(4)];
-
-    const target: number = this.findTarget(currentCup, pickedUpCups);
-    this.insertIntoGamestate(target, pickedUpCups);
-    
+    // Pick up three cups and close the circle behind them
+    this.pickUpCups();
+    // Find the target cup
+    const target: Cup = this.findTarget();
+    // Insert picked up cups behind the target and fix their references
+    this.insertIntoGamestate(target);
     // When the move is done, update the gameState.
-    currentCup = this.gameState.shift()!
-    this.gameState.push(currentCup);
+    this.currentCup = this.currentCup.nextCup;
   }
 
 
-  findTarget(currentCup: number, pickedUpCups: number[]): number{
-    let target: number = currentCup -1;
+  pickUpCups(): void{
+    const cup1: Cup = this.currentCup.nextCup;
+    const cup2: Cup = cup1.nextCup;
+    const cup3: Cup = cup2.nextCup;
+    const cup4: Cup = cup3.nextCup;
 
+    this.pickedUpCups = [cup1, cup2, cup3];
+    this.currentCup.nextCup = cup4; 
+    cup4.prevCup = this.currentCup;
+  }
+
+
+  findTarget(): Cup{
+    let targetName: number = this.currentCup.name - 1;
     let stillSearching: boolean = true;
-    while(stillSearching){
-      if(target === 0 ){
-        target = 9;
+
+    while (stillSearching) {
+      if (targetName === 0) {
+        targetName = 1000000;
       }
-      if(pickedUpCups.includes(target)){
-        target = target -1;
-      } else{
+      
+      let targetInPickedUp: boolean = false;
+      for(let i = 0; i < this.pickedUpCups.length; i++){
+        if(this.pickedUpCups[i].name === targetName){
+          targetInPickedUp = true;
+        }
+      }
+
+      if (targetInPickedUp) {
+        targetName = targetName - 1;
+      } else {
         stillSearching = false;
       }
     }
 
-    return target;
-  }
-
-
-  insertIntoGamestate(targetCup: number, pickedUpCups: number[]): void{
-    let newGameState: number[] = [];
-    for(let i = 0; i < this.gameState.length; i++){
-      if(this.gameState[i] === targetCup){
-        newGameState = [...this.gameState.slice(0, i+1), ...pickedUpCups, ...this.gameState.slice(i+1)];
-        break;
-      }
+    let targetCup: Cup = new Cup(-1);
+    const target = this.gameState.get(targetName);
+    if(target !== undefined){
+      targetCup = target;
     }
-    this.gameState = newGameState;
+    return targetCup;
   }
 
 
-  printState(): void{
-    console.log(this.gameState);
+  insertIntoGamestate(targetCup: Cup): void{
+    const cup1: Cup = this.pickedUpCups[0];
+    const cup3: Cup = this.pickedUpCups[2];
+
+    cup3.nextCup = targetCup.nextCup;
+    targetCup.nextCup = cup1;
+    cup1.prevCup = targetCup;
+    targetCup.nextCup.prevCup = cup3;
   }
 
 
-  cupsAfter1(): void{
-    let cupsAfter1: number[] = [];
-    for(let i = 0; i < this.gameState.length; i++){
-      if(this.gameState[i] === 1){
-        cupsAfter1 = [...this.gameState.slice(i+1), ...this.gameState.slice(0, i)];
-      }
+  findTwoCupsAfter1(): void{
+    const cup1 = this.gameState.get(1);
+    if(cup1 !== undefined){
+      const cup2: Cup = cup1.nextCup;
+      const cup3: Cup = cup2.nextCup;
+      console.log(cup2.name * cup3.name);
     }
-
-    console.log("Starting from the 1 cup, cups are: ", cupsAfter1);
   }
 }
