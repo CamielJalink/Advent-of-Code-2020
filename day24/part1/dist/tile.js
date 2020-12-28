@@ -13,7 +13,35 @@ var Tile = /** @class */ (function () {
         this.x = x;
         this.y = y;
         this.name = x.toString + "," + y.toString;
+        this.shouldFlip = false;
     }
+    Tile.prototype.determineIfShouldFlip = function () {
+        var blackNeighborTiles = 0;
+        if (this.neTile && this.neTile.color === "black") {
+            blackNeighborTiles++;
+        }
+        if (this.eTile && this.eTile.color === "black") {
+            blackNeighborTiles++;
+        }
+        if (this.seTile && this.seTile.color === "black") {
+            blackNeighborTiles++;
+        }
+        if (this.swTile && this.swTile.color === "black") {
+            blackNeighborTiles++;
+        }
+        if (this.wTile && this.wTile.color === "black") {
+            blackNeighborTiles++;
+        }
+        if (this.nwTile && this.nwTile.color === "black") {
+            blackNeighborTiles++;
+        }
+        if (this.color === "black" && (blackNeighborTiles === 0 || blackNeighborTiles > 2)) {
+            this.shouldFlip = true;
+        }
+        else if (this.color === "white" && blackNeighborTiles === 2) {
+            this.shouldFlip = true;
+        }
+    };
     return Tile;
 }());
 exports.Tile = Tile;

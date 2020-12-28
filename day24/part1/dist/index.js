@@ -8,7 +8,8 @@ function advent() {
     var input = stringInput.split("\r\n");
     var floor = new floor_1.Floor();
     floor.flipAllTiles(input);
-    floor.countAllColored();
+    console.log("Part 1 answer: " + floor.countAllColored());
+    floor.checkBlackTiles100Days();
 }
 advent();
 // Begin bij tile 0,0 en maak neighbors voor hem.

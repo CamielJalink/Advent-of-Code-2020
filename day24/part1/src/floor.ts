@@ -157,13 +157,39 @@ export class Floor{
   }
 
 
-  countAllColored(): void{
+  countAllColored(): number{
     let numBlackTiles: number = 0;
     this.tiles.forEach((tile: Tile) => {
       if(tile.color === 'black'){
         numBlackTiles++;
       }
     })    
-    console.log("I count this many black tiles: ", numBlackTiles);
+    return numBlackTiles;
+  }
+
+
+  checkBlackTiles100Days(): void{
+    for (let i = 0; i < 100; i++) {
+      this.tiles.forEach((tile: Tile) => {
+        tile.determineIfShouldFlip();
+      })
+
+      this.tiles.forEach((tile: Tile) => {
+        if(tile.shouldFlip){
+          if(tile.color === "white"){
+            tile.color = "black";
+          }
+          else if (tile.color === "black"){
+            tile.color = "white";
+          }
+          else{
+            console.log("---------------")
+          }
+        }
+        tile.shouldFlip = false;
+      })
+
+      console.log("Day " + i + ": " + this.countAllColored());
+    }
   }
 }

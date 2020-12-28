@@ -155,14 +155,29 @@ var Floor = /** @class */ (function () {
                 numBlackTiles++;
             }
         });
-        console.log("I count this many black tiles: ", numBlackTiles);
-        // this.tiles.forEach((tile: Tile) => {
-        //   console.log("---------------------")
-        //   if(tile.color === "black"){
-        //     console.log(tile);
-        //   }
-        //   console.log("---------------------")
-        // })
+        return numBlackTiles;
+    };
+    Floor.prototype.checkBlackTiles100Days = function () {
+        for (var i = 0; i < 100; i++) {
+            this.tiles.forEach(function (tile) {
+                tile.determineIfShouldFlip();
+            });
+            this.tiles.forEach(function (tile) {
+                if (tile.shouldFlip) {
+                    if (tile.color === "white") {
+                        tile.color = "black";
+                    }
+                    else if (tile.color === "black") {
+                        tile.color = "white";
+                    }
+                    else {
+                        console.log("---------------");
+                    }
+                }
+                tile.shouldFlip = false;
+            });
+            console.log("Day " + i + ": " + this.countAllColored());
+        }
     };
     return Floor;
 }());

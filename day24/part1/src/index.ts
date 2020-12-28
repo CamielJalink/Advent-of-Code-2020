@@ -7,7 +7,8 @@ function advent() {
   const input: string[] = stringInput.split("\r\n");
   const floor: Floor = new Floor();
   floor.flipAllTiles(input);
-  floor.countAllColored();
+  console.log("Part 1 answer: " + floor.countAllColored());
+  floor.checkBlackTiles100Days();
 }
 
 advent();
