@@ -170,6 +170,16 @@ export class Floor{
 
   checkBlackTiles100Days(): void{
     for (let i = 0; i < 100; i++) {
+
+      const tilesArray: Tile[] = [];
+      this.tiles.forEach((tile: Tile) => {
+        tilesArray.push(tile);
+      })
+
+      tilesArray.forEach((tile: Tile) => {
+        this.expandTileRange(tile);
+      })
+
       this.tiles.forEach((tile: Tile) => {
         tile.determineIfShouldFlip();
       })
@@ -189,7 +199,16 @@ export class Floor{
         tile.shouldFlip = false;
       })
 
-      console.log("Day " + i + ": " + this.countAllColored());
+      const day: number = i + 1;
+      console.log("Day " + day + ": " + this.countAllColored());
     }
+  }
+
+
+  // By setting the currenttile to be any input tile, 
+  // we can use the checkorcreateneighbors method for part2
+  expandTileRange(tile: Tile): void{
+    this.currentTile = tile;
+    this.checkOrCreateNeighbors();
   }
 }

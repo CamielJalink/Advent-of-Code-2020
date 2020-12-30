@@ -158,11 +158,19 @@ var Floor = /** @class */ (function () {
         return numBlackTiles;
     };
     Floor.prototype.checkBlackTiles100Days = function () {
-        for (var i = 0; i < 100; i++) {
-            this.tiles.forEach(function (tile) {
+        var _this = this;
+        var _loop_1 = function (i) {
+            var tilesArray = [];
+            this_1.tiles.forEach(function (tile) {
+                tilesArray.push(tile);
+            });
+            tilesArray.forEach(function (tile) {
+                _this.expandTileRange(tile);
+            });
+            this_1.tiles.forEach(function (tile) {
                 tile.determineIfShouldFlip();
             });
-            this.tiles.forEach(function (tile) {
+            this_1.tiles.forEach(function (tile) {
                 if (tile.shouldFlip) {
                     if (tile.color === "white") {
                         tile.color = "black";
@@ -176,8 +184,19 @@ var Floor = /** @class */ (function () {
                 }
                 tile.shouldFlip = false;
             });
-            console.log("Day " + i + ": " + this.countAllColored());
+            var day = i + 1;
+            console.log("Day " + day + ": " + this_1.countAllColored());
+        };
+        var this_1 = this;
+        for (var i = 0; i < 100; i++) {
+            _loop_1(i);
         }
+    };
+    // By setting the currenttile to be any input tile, 
+    // we can use the checkorcreateneighbors method for part2
+    Floor.prototype.expandTileRange = function (tile) {
+        this.currentTile = tile;
+        this.checkOrCreateNeighbors();
     };
     return Floor;
 }());

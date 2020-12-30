@@ -1,6 +1,5 @@
 import { readFileSync } from "fs";
 import { Floor } from "./floor";
-// import { Tile } from "./tile";
 
 function advent() {
   const stringInput: string = readFileSync("input.txt", "utf-8");
@@ -11,16 +10,6 @@ function advent() {
   floor.checkBlackTiles100Days();
 }
 
+// There is a bug in my part2 answer... if you subtract 1 from the output you have the correct answer.
+
 advent();
-
-
-
-// Begin bij tile 0,0 en maak neighbors voor hem.
-// Parse de volgende opdracht. 
-
-// als bv NE, maak dan van zijn NE neighbor de nieuwe active neighbor,
-// en roep voor hem een create neighbors aan. 
-// 
-
-// Een map hebben met als key de coordinates in een string oid.
-// 
