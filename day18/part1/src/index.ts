@@ -4,15 +4,16 @@ import { parseExpressions, findClosingBracket, findFullNumber } from "./helpers"
 function advent() {
   const stringInput: string = readFileSync("input.txt", "utf-8");
   const input: string[] = stringInput.split("\r\n");
-  const expressions = parseExpressions(input);
-  console.log(expressions);
+  const expressions: string[] = parseExpressions(input);
+  let result: number = 0;
   expressions.forEach((expression: string) => {
-    solveExpression(expression);
+    result += solveExpression(expression);
   })
+  console.log("Result of adding all numbers together is: ", result);
 }
 
 
-function solveExpression(expression: string){
+function solveExpression(expression: string): number{
   let expressionArray: any[] = [];
 
   for(let i = 0; i < expression.length; i++){
@@ -24,40 +25,48 @@ function solveExpression(expression: string){
       let innerExpression: string = expression.substring(i+1, closingBracketI);
       i = closingBracketI;
       expressionArray.push(innerExpression);
-      // recursie?
     }
     else{
       expressionArray.push(expression[i]);
     }
   }
 
-  console.log(expressionArray);
+
+  if(isNaN(expressionArray[0])){
+    expressionArray[0] = solveExpression(expressionArray[0]);
+  }
+  let result = expressionArray.shift();
+  
+
+  while(expressionArray.length > 1){
+    let sign  = expressionArray[0];
+    let elem2 = expressionArray[1];
+
+    if(isNaN(elem2)){
+      elem2 = solveExpression(elem2);
+    }
+
+    result = solveOneStep(result, sign, elem2);
+    expressionArray.shift();
+    expressionArray.shift();
+  }
+
+  return result;
 }
 
-// Van links naar rechts in plaats van * voor +.
-// // Haakjes herkennen is interessant. 
-// 1 + 2 * 3 + 4 * 5 + 6
-// 1 + (2 * 3) + (4 * (5 + 6))
-// 2 * 3 + (4 * 5)
-// 5 + (8 * 3 + 9 + 3 * 4 * 3)
-// 5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))
-// ((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2
 
-// Begin met parsen vanaf links.
+function solveOneStep(num1: number, sign: string, num2: number): number {
+  if(sign === '+'){
+    return num1+num2;
+  }
+  else if(sign === '*'){
+    return num1*num2;
+  }
+  else{
+    console.error("verkeerde symbool!");
+    return -1;
+  }
+}
 
-// Als je een haakje vindt, zoek 't sluit haakje dat erbij hoort. Getal 1 (of 2) wordt parseSom met alles tussen de haakjes
-
-// Linker getal heet getal 1. 
-    // Als haakje, dan wordt het linker getal het resultaat van alles erbinnen.
-
-    // ParseSom functie die we recursief kunnen aanroepen? 
-
-//  3 + (3 * 3)
-//  parseSom zou hier terug moeten geven: 3 + 9 = 12. 
-//  number 1 is getal 3.
-//  numbre 2 is parseSom(alles binnen haakjes)
-//  parseSom geeft dus resultaat terug van z'n berekening.
-
-// Ik wil iig
 
 advent();
