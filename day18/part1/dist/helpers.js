@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findFullNumber = exports.findClosingBracket = exports.parseExpressions = void 0;
+exports.createExpressionArray = exports.findFullNumber = exports.findClosingBracket = exports.parseExpressions = void 0;
 function parseExpressions(expressions) {
     var parsedExpressions = [];
     var regex = /\S/g;
@@ -46,3 +46,22 @@ function findFullNumber(expression, numStartingI) {
     return Number(fullNumber);
 }
 exports.findFullNumber = findFullNumber;
+function createExpressionArray(expression) {
+    var expressionArray = [];
+    for (var i = 0; i < expression.length; i++) {
+        if (isNaN(Number(expression[i])) === false) {
+            expressionArray.push(findFullNumber(expression, i));
+        }
+        else if (expression[i] === '(') {
+            var closingBracketI = findClosingBracket(expression, i);
+            var innerExpression = expression.substring(i + 1, closingBracketI);
+            i = closingBracketI;
+            expressionArray.push(innerExpression);
+        }
+        else {
+            expressionArray.push(expression[i]);
+        }
+    }
+    return expressionArray;
+}
+exports.createExpressionArray = createExpressionArray;
