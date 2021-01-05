@@ -47,3 +47,24 @@ export function findFullNumber(expression: string, numStartingI: number): number
   }
   return Number(fullNumber);
 }
+
+
+export function createExpressionArray(expression: string){
+  let expressionArray: any[] = [];
+  for (let i = 0; i < expression.length; i++) {
+    if (isNaN(Number(expression[i])) === false) {
+      expressionArray.push(findFullNumber(expression, i));
+    }
+    else if (expression[i] === '(') {
+      let closingBracketI: number = findClosingBracket(expression, i);
+      let innerExpression: string = expression.substring(i + 1, closingBracketI);
+      i = closingBracketI;
+      expressionArray.push(innerExpression);
+    }
+    else {
+      expressionArray.push(expression[i]);
+    }
+  }
+
+  return expressionArray;
+}

@@ -1,4 +1,11 @@
 "use strict";
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var fs_1 = require("fs");
 var helpers_1 = require("./helpers");
@@ -6,47 +13,70 @@ function advent() {
     var stringInput = fs_1.readFileSync("input.txt", "utf-8");
     var input = stringInput.split("\r\n");
     var expressions = helpers_1.parseExpressions(input);
-    console.log(expressions);
+    var result = 0;
     expressions.forEach(function (expression) {
-        solveExpression(expression);
+        var expressionResult = solveExpression(expression);
+        console.log(expressionResult);
+        result += expressionResult;
     });
+    console.log("Result of adding all numbers together is: ", result);
 }
 function solveExpression(expression) {
-    var expressionArray = [];
-    for (var i = 0; i < expression.length; i++) {
-        if (isNaN(Number(expression[i])) === false) {
-            expressionArray.push(helpers_1.findFullNumber(expression, i));
+    var expressionArray = helpers_1.createExpressionArray(expression);
+    if (isNaN(expressionArray[0])) {
+        expressionArray[0] = solveExpression(expressionArray[0]);
+    }
+    var additionSolved = [];
+    while (expressionArray.length > 1) {
+        var elem1 = expressionArray[0];
+        var sign = expressionArray[1];
+        var elem2 = expressionArray[2];
+        if (isNaN(elem1)) {
+            elem1 = solveExpression(elem1);
         }
-        else if (expression[i] === '(') {
-            var closingBracketI = helpers_1.findClosingBracket(expression, i);
-            var innerExpression = expression.substring(i + 1, closingBracketI);
-            i = closingBracketI;
-            expressionArray.push(innerExpression);
-            // recursie?
+        if (isNaN(elem2)) {
+            elem2 = solveExpression(elem2);
         }
-        else {
-            expressionArray.push(expression[i]);
+        if (sign === '*') {
+            additionSolved.push(elem1);
+            additionSolved.push(sign);
+            expressionArray.shift();
+            expressionArray.shift();
+        }
+        else if (sign === '+') {
+            var plusResult = solveOneStep(elem1, sign, elem2);
+            expressionArray.shift();
+            expressionArray.shift();
+            expressionArray[0] = plusResult;
         }
     }
-    console.log(expressionArray);
+    additionSolved = __spreadArrays(additionSolved, expressionArray); // Add the final bits
+    if (isNaN(additionSolved[0])) {
+        additionSolved[0] = solveExpression(additionSolved[0]);
+    }
+    var result = additionSolved.shift();
+    while (additionSolved.length > 1) {
+        var sign = additionSolved[0];
+        var elem2 = additionSolved[1];
+        if (isNaN(elem2)) {
+            elem2 = solveExpression(elem2);
+        }
+        result = solveOneStep(result, sign, elem2);
+        additionSolved.shift();
+        additionSolved.shift();
+    }
+    return result;
 }
-// Van links naar rechts in plaats van * voor +.
-// // Haakjes herkennen is interessant. 
-// 1 + 2 * 3 + 4 * 5 + 6
-// 1 + (2 * 3) + (4 * (5 + 6))
-// 2 * 3 + (4 * 5)
-// 5 + (8 * 3 + 9 + 3 * 4 * 3)
-// 5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))
-// ((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2
-// Begin met parsen vanaf links.
-// Als je een haakje vindt, zoek 't sluit haakje dat erbij hoort. Getal 1 (of 2) wordt parseSom met alles tussen de haakjes
-// Linker getal heet getal 1. 
-// Als haakje, dan wordt het linker getal het resultaat van alles erbinnen.
-// ParseSom functie die we recursief kunnen aanroepen? 
-//  3 + (3 * 3)
-//  parseSom zou hier terug moeten geven: 3 + 9 = 12. 
-//  number 1 is getal 3.
-//  numbre 2 is parseSom(alles binnen haakjes)
-//  parseSom geeft dus resultaat terug van z'n berekening.
-// Ik wil iig
+function solveOneStep(num1, sign, num2) {
+    if (sign === '+') {
+        return num1 + num2;
+    }
+    else if (sign === '*') {
+        return num1 * num2;
+    }
+    else {
+        console.error("verkeerde symbool!");
+        return -1;
+    }
+}
 advent();
